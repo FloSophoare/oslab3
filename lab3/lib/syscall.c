@@ -232,21 +232,25 @@ int str2Str(char *string, char *buffer, int size, int count) {
 
 pid_t fork() {
 	/*TODO:call syscall*/
+	syscall(1, 0, 0,0,0,0);
 	return 0;
 }
 
 int exec(uint32_t sec_start, uint32_t sec_num){
 	/*TODO:call syscall*/
+	syscall(2, 0, 0,0,0,0);
 	return 0;
 }
 
 int sleep(uint32_t time) {
 	/*TODO:call syscall*/
+	syscall(3, 0, 0,0,0,0);
 	return 0;
 }
 
 int exit() {
 	/*TODO:call syscall*/
+	syscall(4, 0, 0,0,0,0);
 	return 0;
 }
 

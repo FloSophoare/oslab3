@@ -12,7 +12,7 @@ int main(void) {
             i --;
             printf("Child Process: Pong %d, %d;\n", data, i);
             //sleep(1);
-            sleep(20);
+            sleep(10);
         }
         exit(0);
     }
@@ -22,7 +22,7 @@ int main(void) {
             i --;
             printf("Father Process: Ping %d, %d;\n", data, i);
             //sleep(1);
-            sleep(20);
+            sleep(10);
         }
         exit(0);
     }

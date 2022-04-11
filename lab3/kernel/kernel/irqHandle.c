@@ -2,7 +2,7 @@
 #include "x86.h"
 #include "device.h"
 
-#define va_to_pa(va) (va + (current + 1) * 0x100000)
+#define va_to_pa(va) (va + (current + 1) * 0x100000)  //what's meaning?
 #define pa_to_va(pa) (pa - (current + 1) * 0x100000)
 
 extern TSS tss;

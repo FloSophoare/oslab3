@@ -74,7 +74,7 @@ void initProc() {
 	asm volatile("popl %0":"=r"(pcb[1].regs.eflags));
 	pcb[1].regs.eflags = pcb[1].regs.eflags | 0x200;
 	pcb[1].regs.cs = USEL(3);
-	pcb[1].regs.eip = loadUMain();
+	pcb[1].regs.eip = loadUMain();  //note this!!
 	pcb[1].regs.ds = USEL(4);
 	pcb[1].regs.es = USEL(4);
 	pcb[1].regs.fs = USEL(4);
