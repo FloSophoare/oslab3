@@ -84,9 +84,14 @@ void initProc() {
 	current = 0; // kernel idle process
 	asm volatile("movl %0, %%esp"::"m"(pcb[0].stackTop)); // switch to kernel stack for kernel idle process
 	enableInterrupt();
+	putStr("in initProc, before int$0x20\n");
 	asm volatile("int $0x20"); // trigger irqTimer
-	while(1) 
+	putStr("in initProc, after int$0x20\n");
+	while(1) {
+		putStr("in initProc, in while loop, before waitForInterrupt\n");
 		waitForInterrupt();
+		putStr("in initProc, in while loop, after waitForInterrupt\n");
+	}
 }
 
 /*

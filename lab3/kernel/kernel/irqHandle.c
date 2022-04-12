@@ -58,18 +58,32 @@ void GProtectFaultHandle(struct StackFrame *sf) {
 
 void timerHandle(struct StackFrame *sf){
 	//TODO 完成进程调度，建议使用时间片轮转，按顺序调度
+	putStr("first line in timerHandle\n");
 	for (int i = 0; i < MAX_PCB_NUM; i++){
-		if (pcb[i].state == STATE_BLOCKED) pcb[i].sleepTime--;
-		if (pcb[i].sleepTime == 0) pcb[i].state = STATE_RUNNABLE;
+		if (pcb[i].state == STATE_BLOCKED) {
+			pcb[i].sleepTime--;
+			putStr("in timerHandle, sleepTime--\n");
+		}
+		if (pcb[i].sleepTime == 0) {
+			pcb[i].state = STATE_RUNNABLE;
+			putStr("in timerHandle, sleepTime == 0\n");
+		}
 	}
 	pcb[current].timeCount++;
 	int i = current;
+	putStr("current = ");
+	putNum(i);
+	putChar('\n');
 	if (pcb[current].timeCount == MAX_TIME_COUNT) {
 		for (i = current + 1; i  != current; i = (i + 1) % MAX_PCB_NUM){
-			if (pcb[i].state == STATE_RUNNABLE) break;
+			if (pcb[i].state == STATE_RUNNABLE) {
+				putStr("in timerhandle, there is a runnable process\n");
+				break;
+			}
 		}
 	}
 	if (i != current){ // switch process
+		putStr("in timerHandle, begin to switch process\n");
 		uint32_t tmpStackTop=pcb[current].stackTop;
         tss.esp0=(uint32_t)&(pcb[current].stackTop);
         asm volatile("movl %0,%%esp"::"m"(tmpStackTop));
@@ -80,6 +94,7 @@ void timerHandle(struct StackFrame *sf){
         asm volatile("popal");
         asm volatile("addl $8,%esp");
         asm volatile("iret");
+		putStr("in timerHandle,  finish switching process\n");
 	}
 }
 
@@ -196,6 +211,7 @@ void syscallFork(struct StackFrame *sf){  // what's use of sf ?  syscall's parem
 	pcb[i].state = STATE_RUNNABLE;
 	pcb[i].timeCount = 0;
 	pcb[i].sleepTime = 0;
+	putStr("last line in syscallFork\n");
 }	
 
 
@@ -208,9 +224,10 @@ void syscallExec(struct StackFrame *sf) {
 	disableInterrupt();
 	secstart = sf->ecx;
 	secnum = sf->edx;
-	loadelf(secstart, secnum, pcb[current].stack, &entry);
+	loadelf(secstart, secnum, (uint32_t)pcb[current].stack, &entry);
 	pcb[current].regs.eip = entry;
 	enableInterrupt();
+	putStr("last line in syscallExec\n");
 }
 
 
@@ -221,6 +238,7 @@ void syscallSleep(struct StackFrame *sf){ // how to pass value to timeSleep thro
 	pcb[current].sleepTime = sf->ecx; // the second parameter of syscall
 	enableInterrupt(); // Teaching assistant told to do this , but I don't understand why.
 	asm volatile ("int $0x20");
+	putStr("last line in syscallSleep\n");
 }	
 
 void syscallExit(struct StackFrame *sf){
@@ -229,4 +247,5 @@ void syscallExit(struct StackFrame *sf){
 	pcb[current].state = STATE_DEAD;
 	enableInterrupt(); // Teaching assistant told to do this , but I don't understand why.
 	asm volatile ("int $0x20");
+	putStr("last line in syscallExit\n");
 }
