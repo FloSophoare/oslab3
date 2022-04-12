@@ -58,7 +58,29 @@ void GProtectFaultHandle(struct StackFrame *sf) {
 
 void timerHandle(struct StackFrame *sf){
 	//TODO 完成进程调度，建议使用时间片轮转，按顺序调度
-
+	for (int i = 0; i < MAX_PCB_NUM; i++){
+		if (pcb[i].state == STATE_BLOCKED) pcb[i].sleepTime--;
+		if (pcb[i].sleepTime == 0) pcb[i].state = STATE_RUNNABLE;
+	}
+	pcb[current].timeCount++;
+	int i = current;
+	if (pcb[current].timeCount == MAX_TIME_COUNT) {
+		for (i = current + 1; i  != current; i = (i + 1) % MAX_PCB_NUM){
+			if (pcb[i].state == STATE_RUNNABLE) break;
+		}
+	}
+	if (i != current){ // switch process
+		uint32_t tmpStackTop=pcb[current].stackTop;
+        tss.esp0=(uint32_t)&(pcb[current].stackTop);
+        asm volatile("movl %0,%%esp"::"m"(tmpStackTop));
+        asm volatile("popl %gs");
+        asm volatile("popl %fs");
+        asm volatile("popl %es");
+        asm volatile("popl %ds");
+        asm volatile("popal");
+        asm volatile("addl $8,%esp");
+        asm volatile("iret");
+	}
 }
 
 
@@ -141,21 +163,29 @@ void memcpy(void* dst,void* src,size_t size){
 	}
 }
 
-void syscallFork(struct StackFrame *sf){
+void syscallFork(struct StackFrame *sf){  // what's use of sf ?  syscall's paremeters 
 	//TODO 完善它
 
 	//TODO 查找空闲pcb，如果没有就返回-1
 	int i=0;
-
+	for (i = 1; i < MAX_PCB_NUM; i++){
+		if (pcb[i].state == STATE_DEAD) break;
+	}
+	if (i == MAX_PCB_NUM) {  //no  vacant pcb
+		pcb[current].regs.eax = -1;  // pass result through eax?
+		return;
+	}
 
 
 	//TODO 拷贝地址空间
-
+	// refer to stack? no, just memcpy 
 
 	// 拷贝pcb，这部分代码给出了，请注意理解
 	memcpy(&pcb[i],&pcb[current],sizeof(ProcessTable));
-	
-	pcb[i].regs.eax = 0;
+	// why these ?
+	pcb[i].pid = i; //to let pid be unusal
+	pcb[current].regs.eax = i; // parent process return value
+	pcb[i].regs.eax = 0; // child process return value
 	pcb[i].regs.cs = USEL(1 + i * 2);
 	pcb[i].regs.ds = USEL(2 + i * 2);
 	pcb[i].regs.es = USEL(2 + i * 2);
@@ -175,15 +205,28 @@ void syscallExec(struct StackFrame *sf) {
 	uint32_t entry = 0;
 	uint32_t secstart = 0;
 	uint32_t secnum =  0;
-
-
+	disableInterrupt();
+	secstart = sf->ecx;
+	secnum = sf->edx;
+	loadelf(secstart, secnum, pcb[current].stack, &entry);
+	pcb[current].regs.eip = entry;
+	enableInterrupt();
 }
 
 
-void syscallSleep(struct StackFrame *sf){
+void syscallSleep(struct StackFrame *sf){ // how to pass value to timeSleep through sf?
 	//TODO:实现它
+	disableInterrupt();
+	pcb[current].state = STATE_BLOCKED;
+	pcb[current].sleepTime = sf->ecx; // the second parameter of syscall
+	enableInterrupt(); // Teaching assistant told to do this , but I don't understand why.
+	asm volatile ("int $0x20");
 }	
 
 void syscallExit(struct StackFrame *sf){
 	//TODO 先设置成dead，然后用int 0x20进入调度
+	disableInterrupt();
+	pcb[current].state = STATE_DEAD;
+	enableInterrupt(); // Teaching assistant told to do this , but I don't understand why.
+	asm volatile ("int $0x20");
 }

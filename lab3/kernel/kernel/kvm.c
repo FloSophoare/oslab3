@@ -55,6 +55,7 @@ void initProc() {
 	int i = 0;
 	for (i = 0; i < MAX_PCB_NUM; i++) {
 		pcb[i].state = STATE_DEAD;
+		//pcb[i].pid = i;  // Is this OK? to let pid be unusal
 	}
 	// kernel process
 	pcb[0].stackTop = (uint32_t)&(pcb[0].stackTop)-8;//这里最好像这样减8对齐，虽然影响不大...
@@ -69,10 +70,10 @@ void initProc() {
 	pcb[1].sleepTime = 0;
 	pcb[1].pid = 1;
 	pcb[1].regs.ss = USEL(4);
-	pcb[1].regs.esp = 0x100000;
+	pcb[1].regs.esp = 0x100000;  //why 0x100000?
 	asm volatile("pushfl");
 	asm volatile("popl %0":"=r"(pcb[1].regs.eflags));
-	pcb[1].regs.eflags = pcb[1].regs.eflags | 0x200;
+	pcb[1].regs.eflags = pcb[1].regs.eflags | 0x200;  // what is this?
 	pcb[1].regs.cs = USEL(3);
 	pcb[1].regs.eip = loadUMain();  //note this!!
 	pcb[1].regs.ds = USEL(4);
