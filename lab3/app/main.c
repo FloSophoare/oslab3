@@ -10,7 +10,6 @@ int uEntry(void) {
 	asm volatile("movw %%ax, %%ds"::"a"(selector));
 	
 	int data = 0;	
-	
 	int ret = fork();
 	int i = 8;
 	if (ret == 0) {
@@ -21,7 +20,7 @@ int uEntry(void) {
 			//sleep(1);
 			sleep(60);
 		}
-		exec(221, 20);
+		//exec(221, 20);
 		exit();
 	}
 	else if (ret != -1) {
@@ -31,8 +30,12 @@ int uEntry(void) {
 			printf("Father Process: Ping %d, %d;\n", data, i);
 			sleep(60);
 		}
+		printf("father process end\n");
+		//exec(221, 20);
 		exit();
+		//printf("father process end\n");
 	}
+	printf("main end\n");
 
 	return 0;
 }
