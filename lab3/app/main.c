@@ -20,7 +20,7 @@ int uEntry(void) {
 			//sleep(1);
 			sleep(60);
 		}
-		//exec(221, 20);
+		exec(221, 20);
 		exit();
 	}
 	else if (ret != -1) {
@@ -33,7 +33,6 @@ int uEntry(void) {
 		printf("father process end\n");
 		//exec(221, 20);
 		exit();
-		//printf("father process end\n");
 	}
 	printf("main end\n");
 

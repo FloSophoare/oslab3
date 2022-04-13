@@ -250,18 +250,17 @@ void syscallFork(struct StackFrame *sf){  // what's use of sf ?  syscall's parem
 void syscallExec(struct StackFrame *sf) {
 	// TODO 完成exec
 	// hint: 用loadelf，已经封装好了
+	putStr("first line in syscallExec\n");
 	uint32_t entry = 0;
 	uint32_t secstart = 0;
 	uint32_t secnum =  0;
 	disableInterrupt();
 	secstart = sf->ecx;
 	secnum = sf->edx;
-	loadelf(secstart, secnum, (uint32_t)pcb[current].stack, &entry);
-	//loadelf(secstart, secnum, (current + 1) * 0x100000, &entry);
+	//loadelf(secstart, secnum, (uint32_t)pcb[current].stack, &entry); //if this, it will print all ping pong many times
+	loadelf(secstart, secnum, (current + 1) * 0x100000, &entry);
 	pcb[current].regs.eip = entry;
-	//pcb[current].regs.esp = 
 	enableInterrupt();
-	//entry();
 	putStr("last line in syscallExec\n");
 }
 
