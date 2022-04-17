@@ -82,19 +82,6 @@ void timerHandle(struct StackFrame *sf){
 		pcb[current].state = STATE_RUNNABLE;
 	}
 	if (pcb[current].state != STATE_RUNNING){
-		/*int next = MAX_PCB_NUM;
-		int i = 0;
-		while (i != MAX_PCB_NUM){
-			i++;
-			if ((i + current) % MAX_PCB_NUM == 0) continue;
-			if (pcb[(i + current) % MAX_PCB_NUM].state == STATE_RUNNABLE){
-				next = (i + current) % MAX_PCB_NUM;
-				//putNum(next);
-				break;
-			}
-		}
-		if (next == MAX_PCB_NUM) next = 0;
-		current = next;*/
 		int j = current;
 		for (j = (current + 1) % MAX_PCB_NUM; j != current; j = (j + 1) % MAX_PCB_NUM){
 			if (pcb[j].state == STATE_RUNNABLE) break;
@@ -224,7 +211,7 @@ void syscallFork(struct StackFrame *sf){  // what's use of sf ?  syscall's parem
 	//TODO 拷贝地址空间
 	// refer to stack? no, just memcpy   // look lab manual carefully!!!!!!!!!!!!
 	//disableInterrupt();
-	memcpy((void*)((i+1)*0x100000),  (void*)((current+ 1)* 0x100000), 0x1000000);
+	memcpy((void*)((i+1)*0x100000),  (void*)((current+ 1)* 0x100000), 0x100000);
 	//enableInterrupt();
 
 	// 拷贝pcb，这部分代码给出了，请注意理解
