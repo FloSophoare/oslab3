@@ -241,13 +241,13 @@ void syscallExec(struct StackFrame *sf) {
 	uint32_t entry = 0;
 	uint32_t secstart = 0;
 	uint32_t secnum =  0;
-	disableInterrupt();
+	//disableInterrupt();
 	secstart = sf->ecx;
 	secnum = sf->edx;
 	//loadelf(secstart, secnum, (uint32_t)pcb[current].stack, &entry); //if this, it will print all ping pong many times
 	loadelf(secstart, secnum, (current + 1) * 0x100000, &entry);
 	pcb[current].regs.eip = entry;
-	enableInterrupt();
+	//enableInterrupt();
 	putStr("last line in syscallExec\n");
 }
 
