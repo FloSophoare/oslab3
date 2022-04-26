@@ -88,7 +88,7 @@ void timerHandle(struct StackFrame *sf){
 		}
 		if (j == current) return;
 		current = j;  //still judge j != current
-		//putStr("current = ");
+		putStr("current = ");
 		//putNum(current);
 		//putChar('\n');
 		pcb[current].state = STATE_RUNNING;  // runing or runnable?
@@ -253,7 +253,7 @@ void syscallExec(struct StackFrame *sf) {
 
 
 void syscallSleep(struct StackFrame *sf){ // how to pass value to timeSleep through sf?
-	//TODO:实现它
+	//TODO:实现它    
 	disableInterrupt();
 	pcb[current].state = STATE_BLOCKED;
 	pcb[current].sleepTime = sf->ecx; // the second parameter of syscall

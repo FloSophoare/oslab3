@@ -6,6 +6,7 @@ int main(void) {
 
     int ret = fork();
     int i = 8;
+    printf("pid = %d\n", ret);
     if (ret == 0) {
         data = 2;
         while( i != 0) {
@@ -21,7 +22,6 @@ int main(void) {
         while( i != 0) {
             i --;
             printf("Father Process: Ping %d, %d;\n", data, i);
-            //sleep(1);
             sleep(10);
         }
         exit(0);
